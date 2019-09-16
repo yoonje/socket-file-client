@@ -50,3 +50,20 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+build*/
+bin
+cfg/*
+cmake-build*
+data/
+lib
+*~
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+
+#CLion
+.idea/*
+
+# Precompiled Headers
+*.gch
+*.pch
