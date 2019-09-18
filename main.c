@@ -24,32 +24,32 @@ int main(int argc, char *argv[]) {
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     if (client_socket < 0) {
-        perror("Can't allocate client_socket");
+        printf("Can't allocate client_socket");
         exit(1);
     }
 
     if (inet_pton(AF_INET, "127.0.0.1", &serveraddr.sin_addr) < 0) { // 주소 정보 할당
-        perror("IPaddress Convert Error");
+        printf("IPaddress Convert Error");
         exit(1);
     }
 
     if (connect(client_socket, (const struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
-        perror("Connect Error");
+        printf("Connect Error");
         exit(1);
     }
 
     if (filename == NULL) {
-        perror("Can't get filename");
+        printf("Can't get filename");
         exit(1);
     }
 
     if (send(client_socket, buff, BUFFSIZE, 0) == -1) {
-        perror("Can't send filename");
+        printf("Can't send filename");
         exit(1);
     }
 
     if (fp == NULL) {
-        perror("Can't open file");
+        printf("Can't open file");
         exit(1);
     }
 
@@ -65,11 +65,11 @@ void send_file(FILE *fp, int sockfd) {
     char line_buf[BUFFSIZE] = {0};
     while ((n = fread(line_buf, sizeof(char), BUFFSIZE, fp)) > 0) {
         if (n != BUFFSIZE && ferror(fp)) {
-            perror("Read File Error");
+            printf("Read File Error");
             exit(1);
         }
         if (send(sockfd, line_buf, n, 0) == -1) {
-            perror("Can't send file");
+            printf("Can't send file");
             exit(1);
         }
         memset(line_buf, 0, BUFFSIZE);
