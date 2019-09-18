@@ -10,29 +10,30 @@
 
 int main(int argc, char *argv[]) {
     struct sockaddr_in serveraddr;
-
-    char *filename = basename(argv[1]);
-
+    char *filename = basename(argv[1]); // filename만을 긁어 오는 함수
     char buff[BUFFSIZE] = {0};
     strncpy(buff, filename, strlen(filename));
-    FILE *fp = fopen(argv[1], "rb");
+    FILE *fp = fopen(argv[1], "rb"); // argv로 들어온 파일 path에 대하여 open
 
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        perror("Can't allocate sockfd");
-        exit(1);
-    }
+    int client_socket;
 
     memset(&serveraddr, 0, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons(SERVERPORT);
 
-    if (inet_pton(AF_INET, "127.0.0.1", &serveraddr.sin_addr) < 0) {
+    client_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (client_socket < 0) {
+        perror("Can't allocate client_socket");
+        exit(1);
+    }
+
+    if (inet_pton(AF_INET, "127.0.0.1", &serveraddr.sin_addr) < 0) { // 주소 정보 할당
         perror("IPaddress Convert Error");
         exit(1);
     }
 
-    if (connect(sockfd, (const struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
+    if (connect(client_socket, (const struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) {
         perror("Connect Error");
         exit(1);
     }
@@ -42,7 +43,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    if (send(sockfd, buff, BUFFSIZE, 0) == -1) {
+    if (send(client_socket, buff, BUFFSIZE, 0) == -1) {
         perror("Can't send filename");
         exit(1);
     }
@@ -52,26 +53,25 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    sendfile(fp, sockfd);
-    puts("Send Success");
+    send_file(fp, client_socket);
 
     fclose(fp);
-    close(sockfd);
+    close(client_socket);
     return 0;
 }
 
-void sendfile(FILE *fp, int sockfd) {
+void send_file(FILE *fp, int sockfd) {
     int n;
-    char sendline[MAX_LINE] = {0};
-    while ((n = fread(sendline, sizeof(char), MAX_LINE, fp)) > 0) {
-        if (n != MAX_LINE && ferror(fp)) {
+    char line_buf[BUFFSIZE] = {0};
+    while ((n = fread(line_buf, sizeof(char), BUFFSIZE, fp)) > 0) {
+        if (n != BUFFSIZE && ferror(fp)) {
             perror("Read File Error");
             exit(1);
         }
-        if (send(sockfd, sendline, n, 0) == -1) {
+        if (send(sockfd, line_buf, n, 0) == -1) {
             perror("Can't send file");
             exit(1);
         }
-        memset(sendline, 0, MAX_LINE);
+        memset(line_buf, 0, BUFFSIZE);
     }
 }
