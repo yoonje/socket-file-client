@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[]) {
     struct sockaddr_in serveraddr;
-    char *filename = basename(argv[1]); // get filename in path
+    char *filename = basename(argv[1]);
     char buff[BUFFSIZE] = {0};
     strncpy(buff, filename, strlen(filename));
     FILE *fp;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    if (inet_pton(AF_INET, "127.0.0.1", &serveraddr.sin_addr) < 0) { // 주소 정보 할당
+    if (inet_pton(AF_INET, "127.0.0.1", &serveraddr.sin_addr) < 0) {
         printf("IP address Convert Error\n");
         exit(1);
     }
