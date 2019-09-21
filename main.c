@@ -43,13 +43,11 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    // file open
     if ((fp = fopen(argv[1], "rb")) == NULL) {
         printf("Can't open file\n");
         exit(1);
     }
 
-    // send filename
     if (send(client_socket, buff, BUFFSIZE, 0) == -1) {
         printf("Can't send filename\n");
         exit(1);
